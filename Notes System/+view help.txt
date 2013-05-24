@@ -1,0 +1,21 @@
+The note system supports three privacy levels: Views visible to everyone, Notes visible only to the owner of the object and staff, and Staffnotes visible only to staff.
+
+%xrSyntax:%xn +<command>[/switch] [object][/title][=text]
+
+The system is built on three commands, each of which manipulates a specific permission level.
+* +view - The primary command, +view displays all Views, Notes and Staffnotes in the room.
+* +note - This command shows all Notes and Staffnotes in the room.
+* +staffnote - Members of staff may use this command to display all Staffnotes in the room.
+
+* +<command> <object> - This command shows all Views, Notes and/or Staffnotes on the target object. You can prefix the object's name with an asterisk or enter it as a dbref to interact with it while it's not in the same room as you.
+
+* +<command> <object>/<title> - This command shows a specific View, Note or Staffnote on the object.
+* +<command>/approve <object>/<title> - Members of staff may set a View, Note or Staffnote as approved or unapprove it with /unapprove.
+* +<command>/lock <object>/<title> - In the case of Views, Notes or Staffnotes that shouldn't be player-editable, staffmembers can /lock them. The /unlock switch reverses it.
+
+The owner of the object in question or a member of staff has access to a few more commands to edit notes on the object:
+* +<command> <object>/<title>=<text> - The basic editing command overwrites the specified View, Note or Staffnote. Overwriting it with nothing removes the note entirely. Note that editing an approved note will unapprove it and a log of the previously approved note will be saved as a Staffnote.
+* +<command>/append <object>/<title>=<text> - Instead of overwriting the existing note, this command appends the new text to the end.
+* +<command>/rename <object>/<title>=<new title> - As long as there isn't another View, Note or Staffnote with the same name, this command changes the note's title.
+* +<command>/transfer <object>/<title>=<new permission level> - The note in question may be "shown"/"hidden" by having its permission level changed. Note that you can set things to permission levels you can't actually see, though you will have no more access.
+* +<command>/clone <object>/<title>=<new permission level> - This command is the same as above, except that it maintains a copy of the note at the original level.

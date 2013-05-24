@@ -1,0 +1,15 @@
+&C_VIEW #116=$+view*:@pemit %#=[null(regmatchi(%0, s? (.+), 0 1))][switch(%q1, , u(me/f_view-default), /*, u(me/f_view-do-switch, after(first(%q1), /), rest(%q1)), *=*, u(me/f_view-edit, trim(%q1)), *, u(me/f_view-specific, trim(%q1)), %xhError:%xn Command is "+view%[/<switch>%] %[<object>%]%[/<view item>%]")]
+
+&F_VIEW-DO-SWITCH #116=ifelse(setr(0, grab(lattr(me/f_view/*), f_view/%0*)), u(%q0, %1), No such switch for +view. Valid switches are: [u(f_andlist-titles, iter(lattr(me/f_hangouts/*), after(##, /)))])
+
+&F_VIEW-DEFAULT #116=[setq(0, iter([loc(%#)] [lcon(loc(%#))], ifelse(and(strlen(lattr(##/view_*)), not(andflags(##, WD))), ##, )))][ifelse(%q0, Viewable Items in Current Location: [iter(%q0, %r[space(3)] [ifelse(match(##, loc(%#)), %xhHere%xn, [ansimoniker(h, ##)])]: [u(f_andlist-titles, edit(lattr(##/view_*), VIEW_, %b))])], There are no viewable items in your current location.)]
+
+&F_VIEW-SPECIFIC #116=[setq(0, ifelse(strlen(setr(0, before(%0, /))), %q0, here))][setq(1, edit(after(%0, /), %b, _))][setq(2, locate(%#, %q0, mhni))][switch(1, match(%q2, #-1*), I don't see that here., match(%q2, #-2*), I don't know which one you mean!, and(strlen(%q0), not(strlen(%q1))), [setq(3, lattr(%q2/VIEW_*))][ifelse(strlen(%q3), Viewable items on [moniker(%q2)]: %r[space(3)] [u(f_andlist-titles, edit(lattr(%q2/view_*), VIEW_, %b))], [moniker(%q2)] has no viewable items set.)], and(strlen(%q0), strlen(%q1)), [setq(3, grab(lattr(%q2), VIEW_%q1*))][ifelse(%q3, [wheader(View of [ansimoniker(h, %q2)]%xh's [iter(edit(lcstr(trim(edit(%q3, VIEW_, %b))), _, %b), capstr(itext(0)))])]%r[get_eval(%q2/%q3)] %r[ifelse(and(hasattr(%q2, o%q3), not(andflags(%#, WD))), [set(me, sex:[get(%#/sex)])][force(%#, @oemit %#=%n [get_eval(%q2/o%q3)])], )][wfooter()], [moniker(%q2)] has no such view.)], %xhError:%xn I don't understand what you're trying to view.)]
+
+&F_ANDLIST-TITLES #116=[iter(%0, ifelse(eq(#@, words(%0, %1)), [ifelse(neq(words(%0, %1), 1), and%b, )][iter(edit(lcstr(##), _, %b), capstr(itext(0)))], [iter(edit(lcstr(##), _, %b), capstr(itext(0)))][ifelse(neq(#@, dec(words(%0, %1))), %, ,)]), %1)].
+
+&F_VIEW-EDIT #116=[setq(0, ifelse(strlen(setr(0, before(%0, /))), %q0, here))][setq(0, locate(%#, %q0, mhni))][setq(1, before(after(%0, /), =))][setq(2, view_[edit(%q1, %b, _)])][setq(3, after(%0, =))][trigger(me/f_view-edit-force, %#, %q0, %q2, %q3)]
+
+&F_VIEW-EDIT-FORCE #116=@force %0=@set %1=%2:%3
+
+&F_VIEW-PEMIT #116=@pemit %0=[switch(%1, , u(me/f_view-default), /*, u(me/f_view-do-switch, after(first(%1), /), rest(%1)), *=*, u(me/f_view-edit, trim(%1)), *, u(me/f_view-specific, trim(%1)), %xhError:%xn Command is "+view%[/<switch>%]%[<object>%]%[/<view item>%]")]

@@ -1,0 +1,185 @@
+Start:
+	1. User invokes +view, +note or +staffnote.
+	2. #116 catches it. $^\+(view|note|staffnote)(\/)?(rename|transfer|clone)? ?(([^\/]+)(\/(([^=]+)=?(.+)?)?)?)?$:think %0%r%1%r%3%r%5%r%8%r%9.
+		> %0 = Whole command string.
+		> %1 = Command.
+		> %2 = Whether or not a switch is being called.
+		> %3 = Switch.
+		> %5 = Object.
+		> %8 = Note title.
+		> %9 = Text
+		a. If %3 == rename, GoTo Rename 1 and pass command, object, note title and text. u(me/fn_rename, %1, %5, %8, %9).
+		b. Else if %3 == transfer, GoTo Transfer 1 and pass command, object, note title and text. u(me/fn_transfer, %1, %5, %8, %9, 0).
+		c. Else if %3 == clone, GoTo Transfer 1 and pass command, object, note title and text. u(me/fn_transfer, %1, %5, %8, %9, 1).
+		d. Else if %2, Get Error 10 and break.
+		e. Else if %9, GoTo Edit 1 and pass command, object, note title and text. u(me/fn_edit, %1, %5, %8, %9).
+		f. Else if %8, GoTo View 1 and pass command, object and note title. u(me/fn_view, %1, %5, %8).
+		g. Else, GoTo List 1 and pass command and object. u(me/fn_list, %1, %5).
+
+List:
+	> %0 = Command.
+	> %1 = Object.
+	1. If an object is specified in %1
+		> %q0 = # or  *.
+		> %q1 = Name or number.
+		a. ...by name, check enactor's location for any object with that name.
+			i. If #-1, Get Error 1 and break.
+			ii. If #-2, Get Error 2 and break.
+		b. ...by dbref or *name, check for any object with that dbref. If not, Get Error 3 and break.
+		c. Get a list of it and set %q0. GoTo 3.
+	2. Else if no object is specified in %1, get a list of the enactor's location and all objects in it and set %q0.
+	3. Check how many objects are in the list %q0.
+		a. If the list of objects has more than one entry, output "Viewable objects in this location:".
+		b. Else if the list of objects has one entry, output "Views on ".
+			i. If the entry is the enactor, output "yourself:"
+			ii. Else, output "[name(%q0)]:"
+	4. Look at each object on the list.
+		a. setq(1, lattr(itext(0)/_%0_*)
+		b. If the enactor is the owner or staff, make a list of each note. Append %xc%xh and %xn to either end and add to the end of the view list.
+		c. If the enactor is staff, make a list of each staffnote. Append %xr and %xn to either end and add to the end of the view/note list.
+		d. If no list exists,
+			i. ...and %1, Get Error 4 and break.
+			i. ...and !%1, GoTo 4.
+		e. Output the object's name.
+		f. Run the whole affair through Thenomain's list formatter code.
+		g. Output the list.
+
+View:
+	> %0 = Command.
+	> %1 = Object.
+	> %2 = Note title.
+	1. If no attribute "setr(0, _%0_[edit(%2, %b, _)])" exists on object %1, Get Error 5 and break.
+	2. If %0 == staffnote or %0 == note, Get Permissions 1 and pass command and object. u(me/fn_perms, %0, %1).
+	3. If 0 was returned, Get Error 6 and break.
+	4. Else, run %1/%q0 through the regex.
+		> %q1 = Timestamp of last edit.
+		> %q2 = Dbref of last editor.
+		> %q3 = Approved/unapproved.
+		> %q4 = Timestamp of approval. Default = 0
+		> %q5 = Dbref of approving staff.
+		> %q6 = Content.
+		a. Output %q6.
+		b. Output "Last edited on [convsecs(%q1)]".
+		c. Output " by [moniker(%q2)]."
+		d. If %q3 == "approved", output "Approved on [convsecs(local, %q4)] by [moniker(%q5)]."
+
+Edit:
+	> %0 = Command.
+	> %1 = Object.
+	> %2 = Note title.
+	> %3 = Text.
+	1. Get Permissions 1 and pass command and object. u(me/fn_perms, %0, %1).
+	2. If 0 was returned, Get Error 7 and break.
+	3. setq(0, _%0_[edit(%2, %b, _)]).
+	5. If %3, set(%1, %q0:[secs()]|%#|unapproved|0|#-1|%3).
+	6. Else, set(%1, %q0:).
+
+Rename:
+	> %0 = Command.
+	> %1 = Object.
+	> %2 = Note title.
+	> %3 = New title.
+	1. If no attribute "setr(0, _%0_[edit(%2, %b, _)])" exists on object %1, Get Error 5 and break.
+	2. Get Permissions 1 and pass command and object. u(me/fn_perms, %0, %1).
+	3. If 0 was returned, Get Error 7 and break.
+	4. setq(1, _%0_[edit(%3, %b, _)]).
+	5. set(%1, %q1:[get(%1/%q0)]).
+	6. set(%1, %q0:).
+
+Transfer:
+	> %0 = Command.
+	> %1 = Object.
+	> %2 = Note title.
+	> %3 = New permission level.
+	> %4 = Clone.
+	1. If %3 is not "view", "note" or "staffnote", Get Error 8 and break.
+	2. If no attribute "setr(0, _%0_[edit(%2, %b, _)])" exists on object %1, Get Error 5 and break.
+	3. Get Permissions 1 and pass command and object. u(me/fn_perms, %0, %1).
+	4. If 0 was returned, Get Error 7 and break.
+	5. If an attribute "setr(1, _%3_[edit(%2, %b, _)])" exists on object %1, Get Error 9 and break.
+	6. set(%1, %q1:[get(%1/%q0)]).
+	7. If %4 == 0, set(%1, %q0:).
+
+Permissions:
+	> %0 = Command.
+	> %1 = Object.
+	1. If %0 == staffnote,
+		a. ...if hasflags(%1, WZ) == 1, Return 1.
+	2. Else if %# == owner(%1), Return 1.
+	3. Else, Return 0.
+
+Error:
+	1. Output "I don't see that here."
+	2. Output "There is more than one object by that name. Try the dbref of the one you want."
+	3. Output "There is no such object."
+	4. Output "None."
+	5. u(me/err_no-<command>)
+		a. Output "There is no such view."
+		b. Output "There is no such note."
+		c. Output "There is no such staffnote."
+	6. Output "You don't have permission to read that."
+	7. Output "You don't have permission to write that."
+	8. Output "No such permission level exists. Please pick view, note or staffnote."
+	9. Output "There's already a note there."
+	10. Output "That isn't a valid switch. Options are /rename, /transfer and /clone."
+
+think regmatchi(+view/transfer Ebla/rock=roll, %\+(view|note|staffnote)(%\/)?(transfer|rename)? ?((%[^%\/%]+)(%\/((%[^=%]+)(=(.+)?)?)?)?)?, 0 1 2 3 4 5 6 7 8 9 A)%q1%r%q2%q3%r%q5%r%q8%r%qA
+
+^\+(view|note|staffnote)(\/(transfer|rename)?)?( [^\/]+(\/([^=]+(=(.+)?)?)?)?)?$
+
+- Staff and owners should be able to view things at range.
+
+- Write in permissions-checking to allow only the owner and staff to set &_view or see/set &_note and to only allow royalty/wizards to see/set &_staffnote.
+	> owner() and isstaff()
+	> How should error messages work? Funnel all permissions checks through a separate function and return an error message, or have each permissions check call the separate function when it returns negative? The former would be nicer in any other language, but the latter might work better in MUSHcode.
+		> Maybe three functions. One to check for owner()||isstaff(), one to check for isstaff and one to output an error message if either of the other two return negative. - No, one function is fine for the checkers, but we'll need multiple error messages, and those should be separate.
+		> Could a single function efficiently differentiate &_staffnote, or would it be easier to have two checkers? - It works just fine in one line of code, though "staffnote" will have to be separated out and passed through.
+		> %0 = view/note/staffnote
+		> %1 = object dbref
+		> match(%0, staffnote)
+		> match(%#, owner(%1))
+		> or(if(not(match(%0, staffnote)), and(hastype(%#, P), match(%#, owner(%1)))), and(hastype(%#, P), isstaff(%#)))
+
+- Errors. As the system becomes more complicated, we'll need more of them. Thenomain's solution works for his code, but I should probably make all errors separate.
+	> Error 1: You don't have permission to view that.
+		> +note when used on an object you don't own and you aren't staff.
+		> +staffnote when you aren't staff.
+	> Error 2: You don't have permission to write that.
+		> +view when used on an object you don't own and you aren't staff.
+		> +note when used on an object you don't own and you aren't staff.
+		> +staffnote when you aren't staff.
+	> Error 3: No such view.
+		> +view when the view invoked doesn't exist.
+	> Error 4: No such note.
+		> +note when the note invoked doesn't exist.
+	> Error 5: No such staffnote.
+		> +staffnote when the staffnote invoked doesn't exist.
+	> Error 6: No such object.
+		> When the object called doesn't exist.
+			> Error #-1
+	> Error 7: Unclear object.
+		> When there are multiple objects with the same name.
+			> Error #-2
+	> Error 8: Duplicate note.
+		> When someone tries to transfer or rename a note and there's already a note of that name.
+
+- There should be timestamping and the dbref of the last person who edited it, with an "approved" or "unapproved" tag that can be manipulated with an /approve switch and stores the dbref of the approving staffer.
+	> %q1 = timestamp of last edit
+	> %q2 = dbref of last editor
+	> %q3 = approved/unapproved
+	> %q4 = timestamp of approval
+	> %q5 = dbref of approving staff
+	> %q6 = content
+	> &_view_whatever Reece=1286524833|#1046|approved|1286525030|#1046|locked|1286828597|#974|This is a test of the view format.
+	> (\d+)\|(#\d+)\|(approved|unapproved)\|(\d+)\|(#\d+)\|(locked|unlocked)\|(\d+)\|(#\d+)\|(.+)
+	> think regmatchi(get(%#/_view_whatever), (%[0-9%]+)%\|(#%[0-9%]+)%\|(approved|unapproved)%\|(%[0-9%]+)%\|(#%[0-9%]+)%\|(locked|unlocked)%\|(%[0-9%]+)%\|(#%[0-9%]+)%\|(.+), 0 1 2 3 4 5 6 7 8 9)%q0%r%q1%r%q2%r%q3%r%q4%r%q5%r%q6
+
+- Make &view into &_view.
+
+- Split &f_view-specific into a specific-list function and a specific-note function.
+
+- #116 should be the owner of all note attributes and they should be locked. That way, even if someone knows the code, only a wizard can edit them directly. At least, I'm pretty sure that royalty/staff can't edit a locked attribute owned by a wizard.
+
+- Expand +view to check for &_note and &_staffnote and display them in contrasting colors.
+
+- There should be a /trans(fer) switch for +view/+note/+staffnote, so that people with permissions can make previously private things public. Is there call for a /copy switch?

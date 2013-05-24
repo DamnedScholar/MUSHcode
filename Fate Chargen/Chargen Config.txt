@@ -1,0 +1,33 @@
+@@ Chargen Config
+@@   For the love of God, don't delete any of these attributes. Except aspects above 2. Those are fine to delete.
+@@   Bio Fields: These are pretty much freeform. The system checks to make sure they exist and then demands that the player provide some input for each one. When the user fills out a field, the system will check for a limit attribute related to the field. The limit attribute should be a pipe-delimited list of valid answers. Note that a lot of bio fields in various settings (like the clan example, below), could (or should) be rolled into High Concept or another aspect. For games like DFRPG, Template counts as a bio field.
+@@     > &bio-template-limit Chargen Config=Wizard|Minor Talent|Red Court Infected|He Who Walks Behind
+@@   Aspects 1 and 2: These attributes are provided in case you want to rename the primary two aspects.
+@@   Aspects 3 through n: A list of the secondary aspects that will be set in chargen.
+@@   Skill Points: Total number of skill points allocated. If the number of skill points doesn't fit into a perfect pyramid and &pyramid is set to 1, the system will not allow characters to spend all of their skill points. Perfect pyramids: 1, 4, 10, 20, 35, 56, 84, etc. Games will want either 20 or 35.
+@@   Skill Cap: The highest rating in a skill that a player may purchase during character creation.
+@@   Skill Pyramid: 0 or 1 depending on whether or not characters will be forced to organize their skills into a pyramid.
+@@   Free Stunts: The number of stunts that a character can have without spending any refresh.
+@@   Custom Stunts: Stunts are meant to be made up, but this option exists in case someone wants to disable customs. 0 or 1 for off and on; on is default.
+@@   Refresh: The starting refresh for a character.
+@@   Extras: Many games will need powers and/or other extras on the sheet. The &extra attributes are an expansible system that allow for additional sheet sections. By default, the generator just draws from the list of powers, charges that amount of refresh or power points, and adds to the character's sheet. More complex operations (like coding DFRPG's focus items) can be added as needed.
+@@   Powers Cost Refresh: 0 or 1 depending on whether buying powers (the default category of extras) decreases a character's refresh, or they come out of a different pool. For free powers, enter them into the system with a cost of 0.
+@@   Power Allotment: In the case that powers come out of a pool other than refresh, these attributes define the name of the alternative pool and the size of that pool. If &extra-1-cost-refresh is 0, this pool should be non-zero. For stylistic reasons (consistency with the game material, mostly), the name should be lower-case (sheets and such can be coded to capitalize it when necessary).
+&bio-fields Chargen Config=Name|Age
+&aspect-1 Chargen Config=High Concept
+&aspect-2 Chargen Config=Trouble
+&aspect-3 Chargen Config=Your Adventure
+&aspect-4 Chargen Config=Crossing Paths
+&aspect-5 Chargen Config=Crossing Paths Again
+&skill-points Chargen Config=20
+&skill-cap Chargen Config=4
+&skill-pyramid Chargen Config=1
+&free-stunts Chargen Config=3
+&custom-stunts Chargen Config=1
+&refresh Chargen Config=3
+@@ &extra-1 Chargen Config=Powers
+@@ &extra-1-cost-refresh Chargen Config=1
+@@ &extra-1-allotment-name Chargen Config=power points
+@@ &extra-1-allotment Chargen Config=0
+@@ &extra-1-cap Chargen Config=0
+@@ &extra-1-pyramid Chargen Config=0

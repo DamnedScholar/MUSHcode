@@ -1,0 +1,25 @@
+@create SFGO
+@create Chargen Controller
+@create Chargen Config
+@create Chargen Data
+@create Chargen Functions
+
+@parent Chargen Config=Chargen Controller
+@parent Chargen Data=Chargen Controller
+@parent Chargen Functions=Chargen Controller
+
+@@ Set %va, %vb, and %vc to Chargen Config, Chargen Data, and Chargen Functions, respectively. They will be calling each other rather often. They're ordered that way because alphabets, and will be the same across all Controllers.
+@force me=@set Chargen Controller=va:[num(Chargen Config)]
+@force me=@set Chargen Controller=vb:[num(Chargen Data)]
+@force me=@set Chargen Controller=vc:[num(Chargen Functions)]
+
+@@ Import Chargen Controller Object
+@@ Import Chargen Config Object
+@@ Import Chargen Data Object
+@@ Import Function Object
+
+give Chargen Controller=Chargen Config
+give Chargen Controller=Chargen Data
+give SFGO=Chargen Controller
+give SFGO=Functions
+@name SFGO=Sammi's Fate Generator Object <SFGO>

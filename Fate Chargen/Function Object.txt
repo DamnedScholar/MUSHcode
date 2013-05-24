@@ -1,0 +1,25 @@
+@@ Function Object
+@@   - All function calls get made by the controller objects with the format u(%vc/fn_<function>, %va, %vb, <input>[, <target>])
+@@   Bio Fields
+@@     - Display available bio fields and their limits. Take input and check to see how well it meets the limit.
+@@   Aspects
+@@     - Display descriptions and take input for High Concept and Trouble.
+@@       > +aspect 1=Spiritualist Cowboy Superhero
+@@     - Display descriptions and take input for secondary aspects. If there's an aspect with no desc, display an error message.
+@@       > +aspect 3=The Loneliest Ranger
+@@   Skills
+@@     - Display a list of skills pulled from %1/skills.
+@@     - More information on individual skills is stored in %1/skill-<name>.
+@@       > +skill Fight
+@@     - Allow freeform setting of skills up to the skill point allotment. Recognize qualities as numbers. Send an error if the skill point allotment is exceeded or if the user attempts to set a skill above the cap.
+@@       > +skill Fight to Fair
+@@       > +skill Fight to 2
+@@     - Warn the user if skills don't conform to the pyramid structure if any.
+@@   Errors
+@@     - Need an error message for when there's no aspect desc for a particular secondary aspect.
+@@     - Need an error message for when an aspect doesn't exist.
+@@     - Need an error message for when a skill doesn't exist.
+@@     - Need an error message for when a user attempts to spend more skill points than allotted.
+@@     - Need an error message for when a user attempts to set a skill above the cap.
+@@     - Need an error message for when a stunt doesn't exist with directions on how to submit custom stunts (but not if they're disabled).
+@@     - Need an error message for when a stunt or extra has a prerequisite that the user doesn't possess.

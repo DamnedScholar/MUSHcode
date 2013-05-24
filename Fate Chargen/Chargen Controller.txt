@@ -1,0 +1,2 @@
+@@ Chargen Controller Object
+@@   This object will be the one that contains all the $-commands for chargen and calls various functions.
